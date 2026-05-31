@@ -21,6 +21,10 @@ class TeamPolicy
      */
     public function view(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->belongsToTeam($team);
     }
 
@@ -37,6 +41,10 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->hasTeamPermission($team, TeamPermission::UpdateTeam);
     }
 
@@ -45,6 +53,10 @@ class TeamPolicy
      */
     public function addMember(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->hasTeamPermission($team, TeamPermission::AddMember);
     }
 
@@ -53,6 +65,10 @@ class TeamPolicy
      */
     public function updateMember(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->hasTeamPermission($team, TeamPermission::UpdateMember);
     }
 
@@ -61,6 +77,10 @@ class TeamPolicy
      */
     public function removeMember(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->hasTeamPermission($team, TeamPermission::RemoveMember);
     }
 
@@ -69,6 +89,10 @@ class TeamPolicy
      */
     public function inviteMember(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->hasTeamPermission($team, TeamPermission::CreateInvitation);
     }
 
@@ -77,6 +101,10 @@ class TeamPolicy
      */
     public function cancelInvitation(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $user->hasTeamPermission($team, TeamPermission::CancelInvitation);
     }
 
@@ -85,6 +113,10 @@ class TeamPolicy
      */
     public function delete(User $user, Team $team): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return ! $team->is_personal && $user->hasTeamPermission($team, TeamPermission::DeleteTeam);
     }
 }
