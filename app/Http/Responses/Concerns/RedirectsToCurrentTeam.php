@@ -8,11 +8,17 @@ trait RedirectsToCurrentTeam
 {
     protected function redirectPathForCurrentTeam($request, string $redirect): string
     {
+        $user = $request->user();
+
+        if ($user->isAdmin()) {
+            return '/admin';
+        }
+
         $team = $this->currentTeam($request);
 
         URL::defaults(['current_team' => $team->slug]);
 
-        return "/{$team->slug}{$redirect}";
+        return "/{$team->slug}/company";
     }
 
     protected function currentTeam($request)

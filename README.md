@@ -15,18 +15,8 @@ docker exec hrapp-laravel.test-1 composer install
 docker exec hrapp-laravel.test-1 npm install
 docker exec hrapp-laravel.test-1 npm run build
 
-# Пускане на миграциите
-docker exec hrapp-laravel.test-1 php artisan migrate
-
-# (Ако стартирате за първи път) Създайте admin потребител
-docker exec hrapp-laravel.test-1 php artisan tinker --execute '
-User::factory()->create([
-    "name" => "Admin",
-    "email" => "admin@hrapp.app",
-    "password" => bcrypt("password"),
-    "is_admin" => true,
-]);
-'
+# Пускане на миграциите + seed данни
+docker exec hrapp-laravel.test-1 php artisan migrate:fresh --seed
 ```
 
 ## Достъп
@@ -35,6 +25,7 @@ User::factory()->create([
 |--------|-----|--------|
 | App (frontend) | http://localhost | Всички регистрирани |
 | Admin Panel | http://localhost/admin | Само `is_admin = true` |
+| Company Panel | http://localhost/{team}/company | Членове на team-а |
 | Login | http://localhost/login | Всички |
 | Register | http://localhost/register | Всички |
 
@@ -43,6 +34,7 @@ User::factory()->create([
 | Email | Password | Роля |
 |-------|----------|------|
 | admin@hrapp.app | password | System admin (`is_admin: true`) |
+| test@hrapp.app | password | Regular — член на Acme Corp, Globex Inc, Initech |
 
 ## Admin Panel
 
@@ -50,29 +42,65 @@ User::factory()->create([
 
 ### Текущи ресурси:
 - **Teams (Companies)** — CRUD на компании/tenants, активиране/спиране
+- **Departments** — CRUD на отдели, филтър по компания
+- **Users** — преглед на потребители, управление на team membership и HR запис
+
+## Company Panel
+
+Достъпен на `/{team:slug}/company` за членове на team-а. Админите (`is_admin = true`)
+също имат достъп до всички company panels.
+
+### Текущи ресурси:
+- **Employees** — CRUD на служители (HR записи), scoped към текущия tenant
+- **Departments** — CRUD на отдели, scoped към текущия tenant
+
+### Процес на достъп:
+1. Потребителят влиза през **Fortify `/login`** (единствен логин, двата панела нямат `->login()`)
+2. Админ → `/admin`, Regular → `/{currentTeam}/company`
+3. Company панелът проверява членство чрез `EnsureTeamMembership` middleware (с admin bypass)
+4. Всички заявки минават през `CompanyAuthenticate` който redirect-ва към `/login`
 
 ## Структура
 
 ```
 app/
 ├── Filament/
+│   ├── Company/
+│   │   └── Resources/
+│   │       ├── DepartmentResource.php     # Company отдели
+│   │       ├── EmployeeResource.php       # Company служители
+│   │       └── Pages/
+│   │           ├── CreateDepartment.php
+│   │           ├── CreateEmployee.php
+│   │           ├── EditDepartment.php
+│   │           ├── EditEmployee.php
+│   │           └── ListDepartments.php (или ListEmployees.php)
 │   └── Resources/
-│       └── Teams/
-│           ├── TeamResource.php
-│           └── Pages/
-│               └── ManageTeams.php
+│       ├── Teams/
+│       │   ├── TeamResource.php
+│       │   └── Pages/
+│       │       └── ManageTeams.php
+│       └── ... (Admin resources)
 ├── Http/
-│   └── Middleware/
-│       ├── EnsureUserIsAdmin.php      # Admin достъп
-│       └── EnsureTeamMembership.php   # Team достъп
+│   ├── Middleware/
+│   │   ├── EnsureUserIsAdmin.php          # Admin достъп
+│   │   ├── EnsureTeamMembership.php       # Team достъп + URL defaults
+│   │   ├── CompanyAuthenticate.php        # Company panel auth → /login
+│   │   └── AdminAuthenticate.php          # Admin panel auth → /login
+│   └── Responses/
+│       └── Concerns/
+│           └── RedirectsToCurrentTeam.php  # Post-login redirect
 ├── Models/
 │   ├── User.php
 │   ├── Team.php
 │   ├── Membership.php
-│   └── TeamInvitation.php
+│   ├── TeamInvitation.php
+│   ├── Employee.php
+│   └── Department.php
 └── Providers/
     └── Filament/
-        └── AdminPanelProvider.php     # /admin конфигурация
+        ├── AdminPanelProvider.php         # /admin конфигурация
+        └── CompanyPanelProvider.php       # /{team}/company конфигурация
 ```
 
 ## Docker

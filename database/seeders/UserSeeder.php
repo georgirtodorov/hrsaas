@@ -29,6 +29,32 @@ class UserSeeder extends Seeder
             $admin->switchTeam($team);
         }
 
+        $testUser = User::firstOrCreate(
+            ['email' => 'test@hrapp.app'],
+            [
+                'name' => 'Test User',
+                'password' => bcrypt('password'),
+                'email_verified_at' => now(),
+            ],
+        );
+
+        if ($testUser->wasRecentlyCreated) {
+            $personalTeam = Team::factory()->personal()->create([
+                'name' => "{$testUser->name}'s Team",
+            ]);
+            $personalTeam->members()->attach($testUser, ['role' => TeamRole::Owner->value]);
+            $testUser->switchTeam($personalTeam);
+        }
+
+        $companies = Team::where('is_personal', false)->limit(3)->get();
+        foreach ($companies as $team) {
+            if (! $testUser->belongsToTeam($team)) {
+                $team->members()->attach($testUser, ['role' => TeamRole::Admin->value]);
+            }
+        }
+
+        $testUser->switchTeam($companies->first());
+
         $users = User::factory(10)->create();
 
         $allUsers = collect([$admin, ...$users]);

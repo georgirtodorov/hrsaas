@@ -6,7 +6,9 @@ use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\User;
 use Closure;
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureTeamMembership
@@ -20,9 +22,16 @@ class EnsureTeamMembership
     {
         [$user, $team] = [$request->user(), $this->team($request)];
 
-        abort_if(! $user || ! $team || ! $user->belongsToTeam($team), 403);
+        abort_if(! $user || ! $team, 403);
+
+        if (! $user->isAdmin() && ! $user->belongsToTeam($team)) {
+            abort(403);
+        }
 
         $this->ensureTeamMemberHasRequiredRole($user, $team, $minimumRole);
+
+        Filament::setTenant($team);
+        URL::defaults(['team' => $team->slug]);
 
         if ($request->route('current_team') && ! $user->isCurrentTeam($team)) {
             $user->switchTeam($team);
