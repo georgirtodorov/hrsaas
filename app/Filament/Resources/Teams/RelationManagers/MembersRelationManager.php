@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Teams\RelationManagers;
 
 use App\Enums\TeamRole;
+use App\Filament\Resources\Users\UserResource;
+use App\Models\User;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -37,8 +39,14 @@ class MembersRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->url(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record])),
+                TextColumn::make('employee.department.name')
+                    ->label('Department')
+                    ->sortable(),
                 TextColumn::make('pivot.role')
+                    ->label('Team Role')
                     ->badge()
                     ->sortable(),
             ])
