@@ -45,7 +45,7 @@ class EnsureTeamMembership
      */
     protected function ensureTeamMemberHasRequiredRole(User $user, Team $team, ?string $minimumRole): void
     {
-        if ($minimumRole === null) {
+        if ($minimumRole === null || $user->isAdmin()) {
             return;
         }
 

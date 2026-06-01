@@ -2,6 +2,7 @@
 
 namespace App\Filament\Company\Resources;
 
+use App\Enums\TeamPermission;
 use App\Filament\Company\Resources\EmployeeResource\Pages\CreateEmployee;
 use App\Filament\Company\Resources\EmployeeResource\Pages\EditEmployee;
 use App\Filament\Company\Resources\EmployeeResource\Pages\ListEmployees;
@@ -22,6 +23,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class EmployeeResource extends Resource
 {
@@ -30,6 +32,30 @@ class EmployeeResource extends Resource
     protected static ?string $recordTitleAttribute = 'first_name';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user && $tenant && $user->hasTeamPermission($tenant, TeamPermission::CreateEmployee);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        $user = auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user && $tenant && $user->hasTeamPermission($tenant, TeamPermission::UpdateEmployee);
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        $user = auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user && $tenant && $user->hasTeamPermission($tenant, TeamPermission::DeleteEmployee);
+    }
 
     public static function getEloquentQuery(): Builder
     {

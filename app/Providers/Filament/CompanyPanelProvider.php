@@ -54,7 +54,7 @@ class CompanyPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 CompanyAuthenticate::class,
-                EnsureTeamMembership::class,
+                EnsureTeamMembership::class.':admin',
             ]);
     }
 }

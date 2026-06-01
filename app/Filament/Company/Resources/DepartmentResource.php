@@ -2,6 +2,7 @@
 
 namespace App\Filament\Company\Resources;
 
+use App\Enums\TeamPermission;
 use App\Filament\Company\Resources\DepartmentResource\Pages\CreateDepartment;
 use App\Filament\Company\Resources\DepartmentResource\Pages\EditDepartment;
 use App\Filament\Company\Resources\DepartmentResource\Pages\ListDepartments;
@@ -20,6 +21,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class DepartmentResource extends Resource
 {
@@ -28,6 +30,30 @@ class DepartmentResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
+
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user && $tenant && $user->hasTeamPermission($tenant, TeamPermission::CreateDepartment);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        $user = auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user && $tenant && $user->hasTeamPermission($tenant, TeamPermission::UpdateDepartment);
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        $user = auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user && $tenant && $user->hasTeamPermission($tenant, TeamPermission::DeleteDepartment);
+    }
 
     public static function getEloquentQuery(): Builder
     {

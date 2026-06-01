@@ -27,6 +27,8 @@ export function AppSidebar() {
         ? `/${page.props.currentTeam.slug}/company`
         : '/';
 
+    const isCompanyAdmin = page.props.currentTeam?.role === 'admin' || page.props.currentTeam?.role === 'owner';
+
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
@@ -46,11 +48,11 @@ export function AppSidebar() {
             href: 'https://laravel.com/docs/starter-kits#react',
             icon: BookOpen,
         },
-        {
+        ...(isCompanyAdmin ? [{
             title: 'Company',
             href: companyUrl,
             icon: Building2,
-        },
+        }] : []),
     ];
 
     return (
