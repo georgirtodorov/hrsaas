@@ -37,6 +37,7 @@ docker exec hrapp-laravel.test-1 php artisan migrate:fresh --seed
 | test@hrapp.app | password | Regular — член на Acme Corp, Globex Inc, Initech |
 | single@hrapp.app | password | Regular — член само на Acme Corp (като `member`) |
 | singleadmin@hrapp.app | password | Regular — член само на Acme Corp (като `admin`) |
+| singleowner@hrapp.app | password | Regular — член само на Acme Corp (като `owner`) |
 
 ## Admin Panel
 
