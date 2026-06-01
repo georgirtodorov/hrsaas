@@ -13,10 +13,10 @@ Route::prefix('{current_team}')
         Route::inertia('dashboard', 'dashboard')->name('dashboard');
     });
 
+Route::post('locale', [LocaleController::class, 'change'])->name('locale.change');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
-
-    Route::post('locale', [LocaleController::class, 'change'])->name('locale.change');
 });
 
 require __DIR__.'/settings.php';
