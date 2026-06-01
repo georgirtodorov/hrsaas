@@ -60,7 +60,7 @@ export function UserMenuContent({ user, teams = [], currentTeam }: Props) {
                 </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {teams.length > 1 ? (
+            {teams.filter(t => !t.isPersonal).length > 1 ? (
                 <>
                     <DropdownMenuLabel className="text-xs text-muted-foreground">
                         Companies
