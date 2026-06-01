@@ -157,11 +157,46 @@ employees:        id, team_id FK, user_id FK?,
 | 0.C.2.6 | Login redirect 500 error — fixed (Missing parameter: team) | ✅ |
 | 0.C.2.7 | AdminAuthenticate middleware (redirect to /login) | ✅ |
 | 0.C.2.8 | Премахнат ->login() от двата панела — единствен Fortify /login | ✅ |
-| 0.C.2.9 | Login redirect: admin → /admin, regular → /{team}/company | ✅ |
+| 0.C.2.9 | Login redirect: admin → /admin, regular → `/{team}/dashboard` (Inertia) | ✅ |
 | **0.C.3** | **Company Resources** | ✅ |
 | 0.C.3.1 | EmployeeResource (tenant-scoped via getEloquentQuery + whereBelongsTo) | ✅ |
 | 0.C.3.2 | DepartmentResource (tenant-scoped via getEloquentQuery + whereBelongsTo) | ✅ |
 | 0.C.3.3 | Create pages auto-fill team_id via mutateFormDataBeforeCreate | ✅ |
+
+#### 0.C.4 — Company Panel Authorization ✅ **ГОТОВО**
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 0.C.4.1 | `EnsureTeamMembership:admin` — member → 403 | ✅ |
+| 0.C.4.2 | Admin bypass в `ensureTeamMemberHasRequiredRole` | ✅ |
+| 0.C.4.3 | `canCreate/canEdit/canDelete` в EmployeeResource | ✅ |
+| 0.C.4.4 | `canCreate/canEdit/canDelete` в DepartmentResource | ✅ |
+| 0.C.4.5 | `->visible()` на DeleteAction за enforceable canDelete | ✅ |
+
+#### 0.C.5 — TeamRole & TeamPermission ✅ **ГОТОВО**
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 0.C.5.1 | TeamPermission enum — employee/department CRUD (6 нови case-a) | ✅ |
+| 0.C.5.2 | TeamRole::Admin — всичко без delete права | ✅ |
+| 0.C.5.3 | TeamRole::Owner — всички TeamPermission-и | ✅ |
+
+#### 0.C.6 — Inertia Integration ✅ **ГОТОВО**
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 0.C.6.1 | Login redirect → `/{team}/dashboard` (Inertia) вместо `/admin`/`/{team}/company` | ✅ |
+| 0.C.6.2 | Company nav link в sidebar footer-а (admin/owner) | ✅ |
+| 0.C.6.3 | Team-switcher в sidebar-а (Laravel starter-kit default) | ✅ |
+
+#### 0.C.7 — Test Users ✅ **ГОТОВО**
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 0.C.7.1 | `single@hrapp.app` — member на Acme Corp | ✅ |
+| 0.C.7.2 | `singleadmin@hrapp.app` — admin на Acme Corp | ✅ |
+| 0.C.7.3 | `singleowner@hrapp.app` — owner на Acme Corp | ✅ |
+| 0.C.7.4 | UserSeeder — `firstOrCreate` за идемпотентност | ✅ |
 
 ---
 
@@ -203,7 +238,8 @@ employees:        id, team_id FK, user_id FK?,
 | Auth | Laravel Fortify |
 | Admin auth | `is_admin` boolean |
 | Admin panel users | `admin@hrapp.app` / `password` |
-| Regular users | `test@hrapp.app` / `password` (Acme Corp, Globex Inc, Initech) |
+| Regular multi-team user | `test@hrapp.app` / `password` (Acme Corp, Globex Inc, Initech) |
+| Single-team users | `single@hrapp.app` (member), `singleadmin@hrapp.app` (admin), `singleowner@hrapp.app` (owner) — Acme Corp |
 | UI | Radix UI + shadcn/ui (React) / Filament UI (admin) |
 | Styling | Tailwind CSS v4 |
 | Build | Vite 8 |
@@ -225,7 +261,10 @@ employees:        id, team_id FK, user_id FK?,
 - **Admin override:** `isAdmin()` потребителите достъпват всички teams от CompanyPanel.
 - **Ръчно scoping:** Без `->tenant()`, Filament не auto-scope-ва. Използваме `getEloquentQuery()` + `whereBelongsTo()` и `mutateFormDataBeforeCreate()` за team_id.
 - **Единен login:** И двата панела НЯМАТ `->login()`. Auth-а е само през Fortify `/login`. Panels redirect-ват към `/login`.
-- **Login redirect:** `RedirectsToCurrentTeam` trait → admin отива на `/admin`, regular user отива на `/{team:slug}/company`.
+- **Login redirect:** `RedirectsToCurrentTeam` trait → admin отива на `/admin`, regular user отива на `/{team}/dashboard` (Inertia, не Filament).
+- **Role-based panel access:** CompanyPanel изисква minimum role `admin` (чрез `EnsureTeamMembership:admin`). Системните админи (`isAdmin()`) прескачат role check-а.
+- **Role-based CRUD:** `TeamRole::Admin` има всички permissions без delete. `TeamRole::Owner` има всичко. Контролът е чрез `canCreate/canEdit/canDelete` override-и в ресурсите + `->visible()` на DeleteAction.
+- **TeamPermission enum:** `employee:create/update/delete` и `department:create/update/delete` — 6 нови case-a. Използва се от `hasTeamPermission()`.
 - **CompanyAuthenticate/AdminAuthenticate:** Custom auth middlewares за всеки панел, redirect-ват към `/login` (вместо `Filament::getLoginUrl()`).
 
 ---
@@ -246,10 +285,11 @@ employees:        id, team_id FK, user_id FK?,
 | http://localhost/admin/teams | Companies |
 | http://localhost/admin/users | Users |
 | http://localhost/admin/departments | Departments |
-| http://localhost/acme-corp/company | Company Panel (dashboard) |
+| http://localhost/acme-corp/dashboard | Inertia Dashboard |
+| http://localhost/acme-corp/company | Company Panel (Filament dashboard) |
 | http://localhost/acme-corp/company/employees | Company Employees |
 | http://localhost/acme-corp/company/departments | Company Departments |
 
 ---
 
-_Последна актуализация: 2026-05-31 (CompanyPanel: /{team:slug}/company, manual tenancy, единен Fortify /login)_
+_Последна актуализация: 2026-06-01 (CompanyPanel authorization, Inertia login redirect, role-based CRUD, test users)_
