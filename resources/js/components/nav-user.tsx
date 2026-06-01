@@ -16,7 +16,7 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export function NavUser() {
-    const { auth, currentTeam } = usePage().props;
+    const { auth, currentTeam, teams } = usePage().props;
     const { state } = useSidebar();
     const isMobile = useIsMobile();
 
@@ -45,7 +45,7 @@ export function NavUser() {
                                   : 'bottom'
                         }
                     >
-                        <UserMenuContent user={auth.user} />
+                        <UserMenuContent user={auth.user} teams={teams} currentTeam={currentTeam} />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>
