@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, Building2, FolderGit2, LayoutGrid } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -23,6 +23,10 @@ export function AppSidebar() {
         ? dashboard(page.props.currentTeam.slug)
         : '/';
 
+    const companyUrl = page.props.currentTeam
+        ? `/${page.props.currentTeam.slug}/company`
+        : '/';
+
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
@@ -41,6 +45,11 @@ export function AppSidebar() {
             title: 'Documentation',
             href: 'https://laravel.com/docs/starter-kits#react',
             icon: BookOpen,
+        },
+        {
+            title: 'Company',
+            href: companyUrl,
+            icon: Building2,
         },
     ];
 
