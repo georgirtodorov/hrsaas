@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { Check, LogOut, Settings } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -10,46 +10,18 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
-import { switchMethod } from '@/routes/teams';
-import type { Team, User } from '@/types';
+import type { User } from '@/types';
 
 type Props = {
     user: User;
-    teams?: Team[];
-    currentTeam?: Team | null;
 };
 
-export function UserMenuContent({ user, teams = [], currentTeam }: Props) {
+export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
         cleanup();
         router.flushAll();
-    };
-
-    const switchTeam = (team: Team) => {
-        const previousTeamSlug = currentTeam?.slug;
-
-        router.visit(switchMethod(team.slug), {
-            onFinish: () => {
-                if (!previousTeamSlug || typeof window === 'undefined') {
-                    router.reload();
-                    return;
-                }
-
-                const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-                const segment = `/${previousTeamSlug}`;
-
-                if (currentUrl.includes(segment)) {
-                    router.visit(currentUrl.replace(segment, `/${team.slug}`), {
-                        replace: true,
-                    });
-                    return;
-                }
-
-                router.reload();
-            },
-        });
     };
 
     return (
@@ -60,26 +32,6 @@ export function UserMenuContent({ user, teams = [], currentTeam }: Props) {
                 </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {teams.filter(t => !t.isPersonal).length > 1 ? (
-                <>
-                    <DropdownMenuLabel className="text-xs text-muted-foreground">
-                        Companies
-                    </DropdownMenuLabel>
-                    {teams.map((team) => (
-                        <DropdownMenuItem
-                            key={team.id}
-                            className="cursor-pointer gap-2 p-2"
-                            onSelect={() => switchTeam(team)}
-                        >
-                            {team.name}
-                            {currentTeam?.id === team.id && (
-                                <Check className="ml-auto h-4 w-4" />
-                            )}
-                        </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                </>
-            ) : null}
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                     <Link
