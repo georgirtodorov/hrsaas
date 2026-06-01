@@ -9,6 +9,7 @@
         "php": "^8.3",
         "filament/filament": "^5.6",
         "inertiajs/inertia-laravel": "^3.0",
+        "laravel-lang/common": "^6.8",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.7",
@@ -75,6 +76,7 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan lang:update --ansi",
             "@php artisan boost:update --ansi"
         ],
         "post-root-package-install": [

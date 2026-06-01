@@ -200,6 +200,73 @@ employees:        id, team_id FK, user_id FK?,
 
 ---
 
+#### Фаза 1 — Internationalization (i18n) ❌ **ПЛАНИРАНА**
+
+##### 1.A — Core Translations (laravel-lang/common)
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.A.1 | `composer require laravel-lang/common` | ✅ |
+| 1.A.2 | `php artisan lang:add bg` — core преводи (validation, auth, fortify, http-statuses) | ✅ |
+| 1.A.3 | `composer.json` → `post-update-cmd` добавяме `@php artisan lang:update` | ✅ |
+
+##### 1.B — App Translation Files
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.B.1 | Създаване `lang/en.json` с 5-10 ключа (nav, buttons, titles) | ❌ |
+| 1.B.2 | Създаване `lang/bg.json` — копие с български превод | ❌ |
+| 1.B.3 | `config/app.php` → `locale` = `env('APP_LOCALE', 'bg')`, `fallback_locale` = `en` | ❌ |
+| 1.B.4 | Добавяне на `APP_LOCALE` и `APP_FALLBACK_LOCALE` в `.env` | ❌ |
+
+##### 1.C — Locale Route & Controller
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.C.1 | `php artisan make:controller LocaleController` | ❌ |
+| 1.C.2 | `change()` метод — валидация (само `en`/`bg`), запис в session | ❌ |
+| 1.C.3 | `POST /locale` route с име `locale.change` | ❌ |
+| 1.C.4 | `SetLocale` middleware — чете locale от session, вика `App::setLocale()` | ❌ |
+| 1.C.5 | Регистриране на `SetLocale` в `web` middleware групата | ❌ |
+
+##### 1.D — Inertia Bridge
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.D.1 | `HandleInertiaRequests` → share `locale` (от `App::getLocale()`) | ❌ |
+| 1.D.2 | `HandleInertiaRequests` → share `translations` (load-ва JSON файла за текущия locale) | ❌ |
+| 1.D.3 | Кеширане на translations per locale (`cache()->rememberForever`) | ❌ |
+
+##### 1.E — React Hooks & Components
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.E.1 | `resources/js/hooks/useTranslation.ts` — `__()` и `trans()` от Inertia shared props | ❌ |
+| 1.E.2 | `resources/js/components/language-switcher.tsx` — бутон за смяна на език | ❌ |
+| 1.E.3 | Добавяне на LanguageSwitcher в sidebar header-а | ❌ |
+| 1.E.4 | Превод на dashboard страницата като proof of concept | ❌ |
+| 1.E.5 | Превод на sidebar navigation текстовете | ❌ |
+| 1.E.6 | Превод на profile/settings страниците | ❌ |
+
+##### 1.F — Filament Panels
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.F.1 | Проверка: Filament auto-използва `app()->getLocale()` | ❌ |
+| 1.F.2 | Превод на navigation labels в CompanyPanel ресурсите | ❌ |
+| 1.F.3 | Превод на form labels, table headers, съобщения | ❌ |
+
+##### 1.G — Persistence (User Preference)
+
+| Стъпка | Описание | Статус |
+|--------|----------|--------|
+| 1.G.1 | Migration: `users.locale` nullable string (2 chars) | ❌ |
+| 1.G.2 | `HandleInertiaRequests` → чете locale от `auth()->user()->locale` | ❌ |
+| 1.G.3 | `LocaleController` → записва locale и в user-а, и в session | ❌ |
+| 1.G.4 | Appearance страницата — radio/select за език (EN/BG) | ❌ |
+
+---
+
 ## 5. Admin Panel — текущ вид
 
 ### Навигация (3 секции)
@@ -223,6 +290,7 @@ employees:        id, team_id FK, user_id FK?,
 ## 6. Следващи стъпки
 
 1. **AbsenceType + LeaveRequest** — модели, миграции, фабрики, ресурси
+2. **Фаза 1 — i18n** — двуезична поддръжка (EN + BG)
 
 ---
 
@@ -292,4 +360,4 @@ employees:        id, team_id FK, user_id FK?,
 
 ---
 
-_Последна актуализация: 2026-06-01 (CompanyPanel authorization, Inertia login redirect, role-based CRUD, test users)_
+_Последна актуализация: 2026-06-01 (CompanyPanel authorization, Inertia login redirect, role-based CRUD, test users, i18n план)_
