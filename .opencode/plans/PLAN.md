@@ -214,10 +214,10 @@ employees:        id, team_id FK, user_id FK?,
 
 | Стъпка | Описание | Статус |
 |--------|----------|--------|
-| 1.B.1 | Създаване `lang/en.json` с 5-10 ключа (nav, buttons, titles) | ❌ |
-| 1.B.2 | Създаване `lang/bg.json` — копие с български превод | ❌ |
-| 1.B.3 | `config/app.php` → `locale` = `env('APP_LOCALE', 'bg')`, `fallback_locale` = `en` | ❌ |
-| 1.B.4 | Добавяне на `APP_LOCALE` и `APP_FALLBACK_LOCALE` в `.env` | ❌ |
+| 1.B.1 | Създаване `lang/en/app.php` — app ключове (Dashboard, Company, Employees...) | ✅ |
+| 1.B.2 | Създаване `lang/bg/app.php` — същите ключове на български | ✅ |
+| 1.B.3 | `config/app.php` → `locale` = `env('APP_LOCALE', 'en')`, `fallback_locale` = `env('APP_FALLBACK_LOCALE', 'en')` | ✅ |
+| 1.B.4 | `.env` → `APP_LOCALE=bg`, `APP_FALLBACK_LOCALE=en` | ✅ |
 
 ##### 1.C — Locale Route & Controller
 
@@ -266,7 +266,6 @@ employees:        id, team_id FK, user_id FK?,
 | 1.G.4 | Appearance страницата — radio/select за език (EN/BG) | ❌ |
 
 ---
-
 ## 5. Admin Panel — текущ вид
 
 ### Навигация (3 секции)
