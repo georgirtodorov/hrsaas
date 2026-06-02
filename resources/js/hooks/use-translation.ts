@@ -5,11 +5,13 @@ export type TranslateFn = (key: string, replace?: Record<string, string | number
 
 export type UseTranslationReturn = {
     locale: string;
+    supportedLocales: string[];
     __: TranslateFn;
 };
 
 export function useTranslation(): UseTranslationReturn {
-    const { locale, translations } = usePage().props;
+    const { locale, supportedLocales, translations } = usePage().props;
+    const locales = (supportedLocales as string[]) ?? ['en', 'bg'];
 
     const __: TranslateFn = useCallback(
         (key: string, replace?: Record<string, string | number>) => {
@@ -26,5 +28,5 @@ export function useTranslation(): UseTranslationReturn {
         [translations],
     );
 
-    return { locale, __ };
+    return { locale, supportedLocales: locales, __ };
 }

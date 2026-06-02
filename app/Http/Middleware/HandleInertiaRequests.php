@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             'currentTeam' => fn () => $user?->currentTeam ? $user->toUserTeam($user->currentTeam) : null,
             'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
             'locale' => app()->getLocale(),
+            'supportedLocales' => config('app.supported_locales', ['en', 'bg']),
             'translations' => fn () => cache()->rememberForever(
                 'translations.'.app()->getLocale(),
                 fn () => array_merge(
