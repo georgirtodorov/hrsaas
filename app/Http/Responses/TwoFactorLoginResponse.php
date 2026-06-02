@@ -14,6 +14,10 @@ class TwoFactorLoginResponse implements TwoFactorLoginResponseContract
 
     public function toResponse($request): Response
     {
+        if ($request->inertia()) {
+            return redirect()->intended($this->redirectPathForCurrentTeam($request, Fortify::redirects('login')));
+        }
+
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 200)
             : redirect()->intended($this->redirectPathForCurrentTeam($request, Fortify::redirects('login')));
