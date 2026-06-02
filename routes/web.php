@@ -14,6 +14,7 @@ Route::prefix('{current_team}')
     });
 
 Route::post('locale', [LocaleController::class, 'change'])->name('locale.change');
+Route::get('language/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');

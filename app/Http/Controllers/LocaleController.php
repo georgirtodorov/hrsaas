@@ -2,11 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class LocaleController extends Controller
 {
+    public function switch(string $locale): RedirectResponse
+    {
+        if (! in_array($locale, config('app.supported_locales', ['en', 'bg']), true)) {
+            abort(404);
+        }
+
+        session()->put('locale', $locale);
+
+        if (auth()->check()) {
+            auth()->user()->update(['locale' => $locale]);
+        }
+
+        return back();
+    }
+
     public function change(Request $request)
     {
         $validated = $request->validate([

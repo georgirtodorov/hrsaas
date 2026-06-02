@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Http\Middleware\CompanyAuthenticate;
 use App\Http\Middleware\EnsureTeamMembership;
 use App\Http\Middleware\SetLocale;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -57,6 +58,13 @@ class CompanyPanelProvider extends PanelProvider
             ->authMiddleware([
                 CompanyAuthenticate::class,
                 EnsureTeamMembership::class.':admin',
+            ])
+            ->userMenuItems([
+                'language' => Action::make('switchLanguage')
+                    ->label(fn (): string => app()->getLocale() === 'bg' ? 'English' : 'Български')
+                    ->url(fn (): string => route('locale.switch', ['locale' => app()->getLocale() === 'bg' ? 'en' : 'bg']))
+                    ->icon('heroicon-o-language')
+                    ->sort(-1),
             ]);
     }
 }
