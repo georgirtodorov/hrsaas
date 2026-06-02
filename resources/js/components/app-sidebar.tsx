@@ -6,6 +6,7 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { TeamSwitcher } from '@/components/team-switcher';
+import { useTranslation } from '@/hooks/use-translation';
 import {
     Sidebar,
     SidebarContent,
@@ -19,6 +20,7 @@ import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
+    const { __ } = useTranslation();
     const page = usePage();
     const dashboardUrl = page.props.currentTeam
         ? dashboard(page.props.currentTeam.slug)
@@ -32,7 +34,7 @@ export function AppSidebar() {
 
     const mainNavItems: NavItem[] = [
         {
-            title: 'Dashboard',
+            title: __('Dashboard'),
             href: dashboardUrl,
             icon: LayoutGrid,
         },
@@ -40,17 +42,17 @@ export function AppSidebar() {
 
     const footerNavItems: NavItem[] = [
         {
-            title: 'Repository',
+            title: __('Repository'),
             href: 'https://github.com/laravel/react-starter-kit',
             icon: FolderGit2,
         },
         {
-            title: 'Documentation',
+            title: __('Documentation'),
             href: 'https://laravel.com/docs/starter-kits#react',
             icon: BookOpen,
         },
         ...(isCompanyAdmin ? [{
-            title: 'Company',
+            title: __('Company'),
             href: companyUrl,
             icon: Building2,
         }] : []),
