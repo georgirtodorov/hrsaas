@@ -35,7 +35,10 @@ app/
 ├── Models/
 │   ├── User.php, Team.php, Membership.php, TeamInvitation.php
 │   ├── Employee.php, Department.php
-│   └── (бъдещи: AbsenceType, LeaveRequest)
+│   ├── AbsenceType.php, LeaveRequest.php
+│   ├── Office.php, Floor.php, Desk.php, Room.php
+│   ├── DeskAssignment.php, DeskBooking.php, RoomBooking.php
+│   └── (бъдещи: ...)
 │
 ├── Filament/
 │   ├── Company/
@@ -82,13 +85,89 @@ team_invitations: id, team_id, email, role, ...
 ### 3.2 Нови (HR)
 
 ```sql
-departments:      id, team_id FK, name, description, timestamps
+departments:      id, team_id FK, name, description,
+                  parent_id FK → departments (tree hierarchy),
+                  manager_id FK → employees (head),
+                  timestamps
                   UNIQUE(team_id, name)
 
 employees:        id, team_id FK, user_id FK?,
                   department_id FK?, first_name, last_name, email,
-                  phone?, job_title?, hire_date?, soft_deletes
+                  phone?, job_title?, hire_date?,
+                  reports_to_id FK → employees (manager),
+                  soft_deletes
                   UNIQUE(team_id, email)
+
+absence_types:    id, team_id FK, name, color (hex), is_paid,
+                  requires_doc?, sort, timestamps
+                  UNIQUE(team_id, name)
+
+leave_requests:   id, team_id FK, employee_id FK, absence_type_id FK,
+                  status enum(pending,approved,rejected,cancelled),
+                  start_date, end_date, is_half_day?, reason?,
+                  approved_by FK?, approved_at?,
+                  cancelled_by FK?, cancelled_at?, timestamps
+
+offices:          id, team_id FK, name, address?, timezone, timestamps
+
+floors:           id, office_id FK, name, floor_number,
+                  floor_plan_url (SVG/PNG), width, height, timestamps
+
+desks:            id, floor_id FK, label,
+                  type enum(permanent,hot,visitor),
+                  pos_x, pos_y, width, height, rotation,
+                  amenities (json), is_active, sort, timestamps
+
+rooms:            id, floor_id FK, name, capacity,
+                  pos_x, pos_y, width, height,
+                  amenities (json), is_active, timestamps
+
+desk_assignments: id, desk_id FK, employee_id FK,
+                  start_date, end_date?, timestamps
+
+desk_bookings:    id, desk_id FK, employee_id FK,
+                  booking_date, is_half_day (full,am,pm),
+                  status enum(confirmed,cancelled,no_show),
+                  checked_in_at?, timestamps
+
+room_bookings:    id, room_id FK, employee_id FK, title,
+                  start_datetime, end_datetime,
+                  status enum(confirmed,cancelled), timestamps
+
+document_categories: id, team_id FK, name, slug, description?,
+                     parent_id FK → document_categories (tree),
+                     icon?, sort, is_system, timestamps
+                     UNIQUE(team_id, name)
+
+document_templates: id, team_id FK, category_id FK, name,
+                    description?, file_path, content_html?,
+                    placeholders (json), language, is_active,
+                    version, timestamps
+
+documents:        id, team_id FK, category_id FK, template_id FK?,
+                  title, employee_id FK?, file_path, file_type,
+                  file_size, content_html?,
+                  status enum(draft,final,archived),
+                  metadata (json), signed_by (json)?,
+                  signed_at?, created_by FK, timestamps
+
+job_descriptions: id, team_id FK, document_id FK?,
+                  title, department_id FK?, reports_to_id FK?,
+                  employment_type, location?, min_salary?,
+                  max_salary?, currency, summary,
+                  responsibilities (json), requirements (json),
+                  nice_to_have (json)?, benefits (json)?,
+                  skills (json)?, is_active, version,
+                  created_by FK, timestamps
+
+job_ads:          id, team_id FK, job_description_id FK,
+                  platform, headline, body, outreach_text?,
+                  status enum(draft,published,closed),
+                  published_url?, published_at?, timestamps
+
+ai_generation_log: id, team_id FK, user_id FK, document_type,
+                   input_prompt, output_content (longtext),
+                   model, tokens_used, duration_ms, created_at
 ```
 
 ---
@@ -200,7 +279,7 @@ employees:        id, team_id FK, user_id FK?,
 
 ---
 
-#### Фаза 1 — Internationalization (i18n) ✅ **ЗАВЪРШЕНА**
+#### Фаза 1 — Internationalization (i18n) ✅ **ЗАВЪРШЕНА** — [i18n-report.md](i18n-report.md)
 
 ##### 1.A — Core Translations (laravel-lang/common)
 
@@ -265,8 +344,48 @@ employees:        id, team_id FK, user_id FK?,
 | 1.G.2 | `SetLocale` — чете locale от `auth()->user()->locale` first | ✅ |
 | 1.G.3 | `LocaleController` — записва locale и в user-а, и в session | ✅ |
 | 1.G.4 | Appearance страница — radio EN/BG selector | ✅ |
+---
+
+### Фаза 2 — Leave Request / Absence Management
+
+**Детайлен план:** [leave-request.md](leave-request.md)
+
+| Фаза | Описание | Статус |
+|------|----------|--------|
+| **2.A** | AbsenceType + LeaveRequest — модели, миграции, Filament Resources, status workflow, validation, permissions | ⏳ Планирано |
+| **2.B** | Balance tracking, Team calendar (Who's Out), Dashboard widgets | ⏳ Планирано |
+| **2.C** | Accrual, carry-over, pro-rata, public holidays, auto-approval, notifications | 🔮 Бъдещо |
+
+### Фаза 4 — Org Chart / Organizational Hierarchy
+
+**Детайлен план:** [org-chart.md](org-chart.md)
+
+| Фаза | Описание | Статус |
+|------|----------|--------|
+| **4.A** | Department tree (parent_id + manager_id), Employee reports_to, Filament tree fields | ⏳ Планирано |
+| **4.B** | Visual org chart, Spotlight, Levels, Export, Matrix reporting | 🔮 Бъдещо |
+
+### Фаза 5 — Desk & Room Booking / Workplace Management
+
+**Детайлен план:** [desk-booking.md](desk-booking.md)
+
+| Фаза | Описание | Статус |
+|------|----------|--------|
+| **5.A** | Offices + Floors + Desks + Rooms CRUD, permanent assignments, hot desking, room booking, floor plan widget | ⏳ Планирано (идея) |
+| **5.B** | Interactive canvas editor, QR check-in, no-show release, waitlist, analytics, calendar sync, Slack/Teams | 🔮 Бъдещо |
+
+### Фаза 6 — Document Hub & AI Content Generation
+
+**Детайлен план:** [document-hub.md](document-hub.md)
+
+| Фаза | Описание | Статус |
+|------|----------|--------|
+| **6.A** | Document Categories + Templates + Documents + Employee self-service | ⏳ Планирано (идея) |
+| **6.B** | AI Job Description Generator + AI Job Ad Generator + AI logs | 🔮 Бъдещо |
+| **6.C** | E-signature, bulk creation, versioning, WYSIWYG, multi-language, job board publishing | 🔮 Бъдещо |
 
 ---
+
 ## 5. Admin Panel — текущ вид
 
 ### Навигация (3 секции)
@@ -289,8 +408,11 @@ employees:        id, team_id FK, user_id FK?,
 
 ## 6. Следващи стъпки
 
-1. **AbsenceType + LeaveRequest** — модели, миграции, фабрики, ресурси
-2. **Фаза 1 — i18n** — двуезична поддръжка (EN + BG)
+1. **Фаза 1 — i18n** — ✅ ЗАВЪРШЕНА, виж [i18n-report.md](i18n-report.md)
+2. **Фаза 2 — Leave Request** — виж [leave-request.md](leave-request.md)
+3. **Фаза 4 — Org Chart** — виж [org-chart.md](org-chart.md)
+4. **Фаза 5 — Desk & Room Booking** — виж [desk-booking.md](desk-booking.md) (идея)
+5. **Фаза 6 — Document Hub & AI Content** — виж [document-hub.md](document-hub.md) (идея)
 
 ---
 
@@ -360,4 +482,4 @@ employees:        id, team_id FK, user_id FK?,
 
 ---
 
-_Последна актуализация: 2026-06-02 (Фаза 1 — i18n завършена, 1.G Persistence имплементирана)_
+_Последна актуализация: 2026-06-02 (Фаза 1 ✅, Фази 2,4,5,6 — планиране)_
