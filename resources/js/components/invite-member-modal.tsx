@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/hooks/use-translation';
 import { store as storeInvitation } from '@/routes/teams/invitations';
 import type { RoleOption, Team } from '@/types';
 
@@ -36,6 +37,7 @@ export default function InviteMemberModal({
     open,
     onOpenChange,
 }: Props) {
+    const { __ } = useTranslation();
     const [inviteRole, setInviteRole] = useState<RoleOption['value']>('member');
 
     const handleOpenChange = (nextOpen: boolean) => {
@@ -58,28 +60,28 @@ export default function InviteMemberModal({
                     {({ errors, processing }) => (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Invite a team member</DialogTitle>
+                                <DialogTitle>{__('Invite a team member')}</DialogTitle>
                                 <DialogDescription>
-                                    Send an invitation to join this team.
+                                    {__('Send an invitation to join this team.')}
                                 </DialogDescription>
                             </DialogHeader>
 
                             <div className="grid gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">Email address</Label>
+                                    <Label htmlFor="email">{__('Email address')}</Label>
                                     <Input
                                         id="email"
                                         name="email"
                                         type="email"
                                         data-test="invite-email"
-                                        placeholder="colleague@example.com"
+                                        placeholder={__('colleague@example.com')}
                                         required
                                     />
                                     <InputError message={errors.email} />
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="role">Role</Label>
+                                    <Label htmlFor="role">{__('Role')}</Label>
                                     <Select
                                         name="role"
                                         data-test="invite-role"
@@ -91,7 +93,7 @@ export default function InviteMemberModal({
                                         }
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select a role" />
+                                            <SelectValue placeholder={__('Select a role')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {availableRoles.map((role) => (
@@ -110,7 +112,7 @@ export default function InviteMemberModal({
 
                             <DialogFooter className="gap-2">
                                 <DialogClose asChild>
-                                    <Button variant="secondary">Cancel</Button>
+                                    <Button variant="secondary">{__('Cancel')}</Button>
                                 </DialogClose>
 
                                 <Button
@@ -118,7 +120,7 @@ export default function InviteMemberModal({
                                     data-test="invite-submit"
                                     disabled={processing}
                                 >
-                                    Send invitation
+                                    {__('Send invitation')}
                                 </Button>
                             </DialogFooter>
                         </>

@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -26,6 +27,7 @@ export default function RemoveMemberModal({
     open,
     onOpenChange,
 }: Props) {
+    const { __ } = useTranslation();
     const [processing, setProcessing] = useState(false);
 
     const removeMember = () => {
@@ -44,16 +46,16 @@ export default function RemoveMemberModal({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Remove team member</DialogTitle>
+                    <DialogTitle>{__('Remove team member')}</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to remove{' '}
+                        {__('Are you sure you want to remove')}{' '}
                         <strong>{member?.name}</strong> from this team?
                     </DialogDescription>
                 </DialogHeader>
 
                 <DialogFooter className="gap-2">
                     <DialogClose asChild>
-                        <Button variant="secondary">Cancel</Button>
+                        <Button variant="secondary">{__('Cancel')}</Button>
                     </DialogClose>
 
                     <Button
@@ -62,7 +64,7 @@ export default function RemoveMemberModal({
                         disabled={processing}
                         onClick={removeMember}
                     >
-                        Remove member
+                        {__('Remove member')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

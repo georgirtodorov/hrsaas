@@ -10,6 +10,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslation } from '@/hooks/use-translation';
 import { edit, index } from '@/routes/teams';
 import type { Team } from '@/types';
 
@@ -18,23 +19,25 @@ type Props = {
 };
 
 export default function TeamsIndex({ teams }: Props) {
+    const { __ } = useTranslation();
+
     return (
         <>
-            <Head title="Teams" />
+            <Head title={__('Teams')} />
 
-            <h1 className="sr-only">Teams</h1>
+            <h1 className="sr-only">{__('Teams')}</h1>
 
             <div className="flex flex-col space-y-6">
                 <div className="flex items-center justify-between">
                     <Heading
                         variant="small"
-                        title="Teams"
-                        description="Manage your teams and team memberships"
+                        title={__('Teams')}
+                        description={__('Manage your teams and team memberships')}
                     />
 
                     <CreateTeamModal>
                         <Button data-test="teams-new-team-button">
-                            <Plus /> New team
+                            <Plus /> {__('New team')}
                         </Button>
                     </CreateTeamModal>
                 </div>
@@ -54,7 +57,7 @@ export default function TeamsIndex({ teams }: Props) {
                                         </span>
                                         {team.isPersonal ? (
                                             <Badge variant="secondary">
-                                                Personal
+                                                {__('Personal')}
                                             </Badge>
                                         ) : null}
                                     </div>
@@ -83,7 +86,7 @@ export default function TeamsIndex({ teams }: Props) {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>View team</p>
+                                                <p>{__('View team')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     ) : (
@@ -103,7 +106,7 @@ export default function TeamsIndex({ teams }: Props) {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>Edit team</p>
+                                                <p>{__('Edit team')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     )}
@@ -114,7 +117,7 @@ export default function TeamsIndex({ teams }: Props) {
 
                     {teams.length === 0 ? (
                         <p className="py-8 text-center text-muted-foreground">
-                            You don't belong to any teams yet.
+                            {__("You don't belong to any teams yet.")}
                         </p>
                     ) : null}
                 </div>
@@ -123,11 +126,15 @@ export default function TeamsIndex({ teams }: Props) {
     );
 }
 
-TeamsIndex.layout = {
-    breadcrumbs: [
-        {
-            title: 'Teams',
-            href: index(),
-        },
-    ],
+TeamsIndex.layout = (page: Record<string, unknown>) => {
+    const translations = page.translations as Record<string, string> | undefined;
+    const t = (key: string) => translations?.[key] ?? key;
+    return {
+        breadcrumbs: [
+            {
+                title: t('Teams'),
+                href: index(),
+            },
+        ],
+    };
 };

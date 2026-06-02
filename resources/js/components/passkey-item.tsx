@@ -1,5 +1,6 @@
 import { KeyRound, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from '@/hooks/use-translation';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export default function PasskeyItem({ passkey, onDelete }: Props) {
+    const { __ } = useTranslation();
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = () => {
@@ -64,26 +66,24 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                     >
                         <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Remove</span>
+                        <span className="sr-only">{__('Remove')}</span>
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <DialogTitle>Remove passkey</DialogTitle>
+                    <DialogTitle>{__('Remove passkey')}</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to remove the "{passkey.name}"
-                        passkey? You will no longer be able to use it to sign
-                        in.
+                        {__('Are you sure you want to remove the ":name" passkey? You will no longer be able to use it to sign in.', { name: passkey.name })}
                     </DialogDescription>
                     <DialogFooter className="gap-2">
                         <DialogClose asChild>
-                            <Button variant="secondary">Cancel</Button>
+                            <Button variant="secondary">{__('Cancel')}</Button>
                         </DialogClose>
                         <Button
                             variant="destructive"
                             onClick={handleDelete}
                             disabled={isDeleting}
                         >
-                            {isDeleting ? 'Removing...' : 'Remove passkey'}
+                            {isDeleting ? __('Removing...') : __('Remove passkey')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

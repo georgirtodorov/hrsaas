@@ -25,6 +25,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useInitials } from '@/hooks/use-initials';
+import { useTranslation } from '@/hooks/use-translation';
 import { edit, index, update } from '@/routes/teams';
 import { update as updateMember } from '@/routes/teams/members';
 import type {
@@ -51,6 +52,7 @@ export default function TeamEdit({
     availableRoles,
 }: Props) {
     const getInitials = useInitials();
+    const { __ } = useTranslation();
 
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -100,8 +102,8 @@ export default function TeamEdit({
                         <>
                             <Heading
                                 variant="small"
-                                title="Team settings"
-                                description="Update your team name and settings"
+                                title={__('Team settings')}
+                                description={__('Update your team name and settings')}
                             />
 
                             <Form
@@ -112,7 +114,7 @@ export default function TeamEdit({
                                     <>
                                         <div className="grid gap-2">
                                             <Label htmlFor="name">
-                                                Team name
+                                                {__('Team name')}
                                             </Label>
                                             <Input
                                                 id="name"
@@ -130,7 +132,7 @@ export default function TeamEdit({
                                                 data-test="team-save-button"
                                                 disabled={processing}
                                             >
-                                                Save
+                                                {__('Save')}
                                             </Button>
                                         </div>
                                     </>
@@ -148,10 +150,10 @@ export default function TeamEdit({
                     <div className="flex items-center justify-between">
                         <Heading
                             variant="small"
-                            title="Team members"
+                            title={__('Team members')}
                             description={
                                 permissions.canCreateInvitation
-                                    ? 'Manage who belongs to this team'
+                                    ? __('Manage who belongs to this team')
                                     : ''
                             }
                         />
@@ -161,7 +163,7 @@ export default function TeamEdit({
                                 data-test="invite-member-button"
                                 onClick={() => setInviteDialogOpen(true)}
                             >
-                                <UserPlus /> Invite member
+                                <UserPlus /> {__('Invite member')}
                             </Button>
                         ) : null}
                     </div>
@@ -251,7 +253,7 @@ export default function TeamEdit({
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                    <p>Remove member</p>
+                                                    <p>{__('Remove member')}</p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
@@ -266,8 +268,8 @@ export default function TeamEdit({
                     <div className="space-y-6">
                         <Heading
                             variant="small"
-                            title="Pending invitations"
-                            description="Invitations that haven't been accepted yet"
+                            title={__('Pending invitations')}
+                            description={__("Invitations that haven't been accepted yet")}
                         />
 
                         <div className="space-y-3">
@@ -309,7 +311,7 @@ export default function TeamEdit({
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                    <p>Cancel invitation</p>
+                                                    <p>{__('Cancel invitation')}</p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
@@ -324,15 +326,14 @@ export default function TeamEdit({
                     <div className="space-y-6">
                         <Heading
                             variant="small"
-                            title="Delete team"
-                            description="Permanently delete your team"
+                            title={__('Delete team')}
+                            description={__('Permanently delete your team')}
                         />
                         <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                             <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-                                <p className="font-medium">Warning</p>
+                                <p className="font-medium">{__('Warning')}</p>
                                 <p className="text-sm">
-                                    Please proceed with caution, this cannot be
-                                    undone.
+                                    {__('Please proceed with caution, this cannot be undone.')}
                                 </p>
                             </div>
                             <Button
@@ -340,7 +341,7 @@ export default function TeamEdit({
                                 data-test="delete-team-button"
                                 onClick={() => setDeleteDialogOpen(true)}
                             >
-                                Delete team
+                                {__('Delete team')}
                             </Button>
                         </div>
                     </div>
@@ -381,15 +382,20 @@ export default function TeamEdit({
     );
 }
 
-TeamEdit.layout = (props: { team: { name: string; slug: string } }) => ({
-    breadcrumbs: [
-        {
-            title: 'Teams',
-            href: index(),
-        },
-        {
-            title: props.team.name,
-            href: edit(props.team.slug),
-        },
-    ],
-});
+TeamEdit.layout = (page: Record<string, unknown>) => {
+    const translations = page.translations as Record<string, string> | undefined;
+    const t = (key: string) => translations?.[key] ?? key;
+    const team = page.team as { name: string; slug: string };
+    return {
+        breadcrumbs: [
+            {
+                title: t('Teams'),
+                href: index(),
+            },
+            {
+                title: team.name,
+                href: edit(team.slug),
+            },
+        ],
+    };
+};
