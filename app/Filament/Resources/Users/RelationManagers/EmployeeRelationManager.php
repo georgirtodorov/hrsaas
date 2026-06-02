@@ -28,36 +28,42 @@ class EmployeeRelationManager extends RelationManager
         return $schema
             ->components([
                 Select::make('team_id')
-                    ->label('Company')
+                    ->label(__('Company'))
                     ->options(fn (): array => Team::all()->pluck('name', 'id')->toArray())
                     ->required()
                     ->searchable()
                     ->live()
                     ->afterStateUpdated(fn (callable $set) => $set('department_id', null)),
                 Select::make('department_id')
-                    ->label('Department')
+                    ->label(__('Department'))
                     ->options(fn (callable $get): array => Department::where('team_id', $get('team_id'))->pluck('name', 'id')->toArray())
                     ->searchable()
                     ->nullable(),
                 TextInput::make('first_name')
+                    ->label(__('First name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('last_name')
+                    ->label(__('Last name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('email')
+                    ->label(__('Email'))
                     ->required()
                     ->email()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
                 TextInput::make('phone')
+                    ->label(__('Phone'))
                     ->tel()
                     ->maxLength(255)
                     ->nullable(),
                 TextInput::make('job_title')
+                    ->label(__('Job title'))
                     ->maxLength(255)
                     ->nullable(),
                 DatePicker::make('hire_date')
+                    ->label(__('Hire date'))
                     ->nullable(),
             ]);
     }
@@ -68,17 +74,21 @@ class EmployeeRelationManager extends RelationManager
             ->recordTitleAttribute('full_name')
             ->columns([
                 TextColumn::make('full_name')
+                    ->label(__('Full name'))
                     ->searchable(),
                 TextColumn::make('email')
+                    ->label(__('Email'))
                     ->searchable(),
                 TextColumn::make('team.name')
-                    ->label('Company')
+                    ->label(__('Company'))
                     ->sortable(),
                 TextColumn::make('department.name')
-                    ->label('Department')
+                    ->label(__('Department'))
                     ->sortable(),
-                TextColumn::make('job_title'),
+                TextColumn::make('job_title')
+                    ->label(__('Job title')),
                 TextColumn::make('hire_date')
+                    ->label(__('Hire date'))
                     ->date(),
             ])
             ->filters([

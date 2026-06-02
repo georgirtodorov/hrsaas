@@ -28,6 +28,7 @@ class MembersRelationManager extends RelationManager
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
             ]);
@@ -39,14 +40,15 @@ class MembersRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable()
                     ->url(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record])),
                 TextColumn::make('employee.department.name')
-                    ->label('Department')
+                    ->label(__('Department'))
                     ->sortable(),
                 TextColumn::make('pivot.role')
-                    ->label('Team Role')
+                    ->label(__('Team Role'))
                     ->badge()
                     ->sortable(),
             ])
@@ -59,6 +61,7 @@ class MembersRelationManager extends RelationManager
                     ->form(fn (AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Select::make('role')
+                            ->label(__('Role'))
                             ->options(fn (): array => collect(TeamRole::assignable())->pluck('label', 'value')->toArray())
                             ->required()
                             ->default(TeamRole::Member->value),
@@ -68,6 +71,7 @@ class MembersRelationManager extends RelationManager
                 EditAction::make()
                     ->form([
                         Select::make('role')
+                            ->label(__('Role'))
                             ->options(fn (): array => collect(TeamRole::assignable())->pluck('label', 'value')->toArray())
                             ->required(),
                     ]),

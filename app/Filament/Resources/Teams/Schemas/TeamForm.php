@@ -14,16 +14,19 @@ class TeamForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255)
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Team::generateUniqueTeamSlug($state))),
                 TextInput::make('slug')
+                    ->label(__('Slug'))
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true)
                     ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/'),
                 Toggle::make('is_active')
+                    ->label(__('Is active'))
                     ->default(true),
             ]);
     }

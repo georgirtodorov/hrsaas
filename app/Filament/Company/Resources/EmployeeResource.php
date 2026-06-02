@@ -33,6 +33,16 @@ class EmployeeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
+    public static function getModelLabel(): string
+    {
+        return __('Employee');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Employees');
+    }
+
     public static function canCreate(): bool
     {
         $user = auth()->user();
@@ -73,13 +83,15 @@ class EmployeeResource extends Resource
             ->columns(2)
             ->components([
                 TextInput::make('first_name')
+                    ->label(__('First name'))
                     ->required()
                     ->maxLength(255),
                 TextInput::make('last_name')
+                    ->label(__('Last name'))
                     ->required()
                     ->maxLength(255),
                 Select::make('user_id')
-                    ->label('User')
+                    ->label(__('User'))
                     ->options(fn (): array => User::query()
                         ->whereHas('teams', fn (Builder $q) => $q->whereKey(Filament::getTenant()?->id ?? 0))
                         ->pluck('name', 'id')
@@ -88,17 +100,20 @@ class EmployeeResource extends Resource
                     ->searchable()
                     ->preload(),
                 Select::make('department_id')
-                    ->label('Department')
+                    ->label(__('Department'))
                     ->relationship('department', 'name')
                     ->searchable()
                     ->preload()
                     ->nullable(),
                 TextInput::make('phone')
+                    ->label(__('Phone'))
                     ->tel()
                     ->maxLength(50),
                 TextInput::make('job_title')
+                    ->label(__('Job title'))
                     ->maxLength(255),
-                DatePicker::make('hire_date'),
+                DatePicker::make('hire_date')
+                    ->label(__('Hire date')),
             ]);
     }
 
@@ -107,20 +122,24 @@ class EmployeeResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('first_name')
+                    ->label(__('First name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('last_name')
+                    ->label(__('Last name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.email')
-                    ->label('Email')
+                    ->label(__('Email'))
                     ->searchable(),
                 TextColumn::make('department.name')
-                    ->label('Department')
+                    ->label(__('Department'))
                     ->sortable(),
                 TextColumn::make('job_title')
+                    ->label(__('Job title'))
                     ->searchable(),
                 TextColumn::make('hire_date')
+                    ->label(__('Hire date'))
                     ->date()
                     ->sortable(),
             ])

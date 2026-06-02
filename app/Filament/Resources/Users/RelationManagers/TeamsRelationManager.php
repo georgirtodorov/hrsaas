@@ -26,6 +26,7 @@ class TeamsRelationManager extends RelationManager
         return $schema
             ->components([
                 Select::make('role')
+                    ->label(__('Role'))
                     ->options(fn (): array => collect(TeamRole::assignable())->pluck('label', 'value')->toArray())
                     ->required(),
             ]);
@@ -37,10 +38,11 @@ class TeamsRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->url(fn (Team $record): string => TeamResource::getUrl('edit', ['record' => $record])),
                 TextColumn::make('pivot.role')
-                    ->label('Team Role')
+                    ->label(__('Team Role'))
                     ->badge()
                     ->sortable(),
             ])
@@ -53,6 +55,7 @@ class TeamsRelationManager extends RelationManager
                     ->form(fn (AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Select::make('role')
+                            ->label(__('Role'))
                             ->options(fn (): array => collect(TeamRole::assignable())->pluck('label', 'value')->toArray())
                             ->required()
                             ->default(TeamRole::Member->value),
@@ -62,6 +65,7 @@ class TeamsRelationManager extends RelationManager
                 EditAction::make()
                     ->form([
                         Select::make('role')
+                            ->label(__('Role'))
                             ->options(fn (): array => collect(TeamRole::assignable())->pluck('label', 'value')->toArray())
                             ->required(),
                     ]),

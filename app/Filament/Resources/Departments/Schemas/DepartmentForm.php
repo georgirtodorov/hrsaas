@@ -15,12 +15,14 @@ class DepartmentForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 Textarea::make('description')
+                    ->label(__('Description'))
                     ->rows(3),
                 Select::make('team_id')
-                    ->label('Company')
+                    ->label(__('Company'))
                     ->options(fn (): array => Team::all()->pluck('name', 'id')->toArray())
                     ->required()
                     ->searchable(),

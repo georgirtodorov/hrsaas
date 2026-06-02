@@ -16,16 +16,19 @@ class DepartmentsTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('team.name')
-                    ->label('Company')
+                    ->label(__('Company'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('description')
+                    ->label(__('Description'))
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
+                    ->label(__('Created at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

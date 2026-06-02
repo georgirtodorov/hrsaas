@@ -25,6 +25,16 @@ class TeamResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    public static function getModelLabel(): string
+    {
+        return __('Team');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Teams');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return TeamForm::configure($schema);

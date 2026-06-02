@@ -31,6 +31,16 @@ class DepartmentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
+    public static function getModelLabel(): string
+    {
+        return __('Department');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Departments');
+    }
+
     public static function canCreate(): bool
     {
         $user = auth()->user();
@@ -70,9 +80,11 @@ class DepartmentResource extends Resource
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
                 Textarea::make('description')
+                    ->label(__('Description'))
                     ->rows(3),
             ]);
     }
@@ -82,12 +94,14 @@ class DepartmentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('description')
+                    ->label(__('Description'))
                     ->limit(50),
                 TextColumn::make('employees_count')
-                    ->label('Employees')
+                    ->label(__('Employees'))
                     ->counts('employees')
                     ->sortable(),
             ])
