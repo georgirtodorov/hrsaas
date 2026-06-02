@@ -46,6 +46,14 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'currentTeam' => fn () => $user?->currentTeam ? $user->toUserTeam($user->currentTeam) : null,
             'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
+            'locale' => app()->getLocale(),
+            'translations' => fn () => cache()->rememberForever(
+                'translations.'.app()->getLocale(),
+                fn () => array_merge(
+                    require lang_path(app()->getLocale().'/app.php'),
+                    json_decode(file_get_contents(lang_path(app()->getLocale().'.json')), true) ?? [],
+                ),
+            ),
         ];
     }
 }
